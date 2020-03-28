@@ -9,7 +9,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DefaultSignatures #-}
 
-module Butler.Test where
+module Butler.TypeInformation where
 
 import GHC.Generics (U1, M1, D, C, Selector(selName), Datatype(datatypeName), S, K1, R, (:*:))
 import Type.Reflection (SomeTypeRep(SomeTypeRep), Typeable)
@@ -37,8 +37,7 @@ instance (Selector s, Typeable t) => Selectors (M1 S s (K1 R t)) where
 
 instance (Selectors a, Selectors b) => Selectors (a :*: b) where
   selectors = selectors @a ++ selectors @b
-
-
+  
 class TypeName rep where
   typename :: String
 
