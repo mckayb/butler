@@ -27,4 +27,4 @@ class Entity a where
     schema = Schema constr fields
         where
             fields = selectors @(Rep a)
-            constr = Text.toLower . Text.pack $ typename @(Rep a)
+            constr = Text.toLower $ typename @(Rep a)

@@ -56,7 +56,7 @@ instance (Selectors a, Selectors b) => Selectors (a :*: b) where
   selectors = selectors @a ++ selectors @b
   
 class TypeName rep where
-  typename :: String
+  typename :: Text
 
 instance (Datatype f) => TypeName (M1 D f x) where
-  typename = datatypeName (undefined :: M1 D f x a)
+  typename = Text.pack $ datatypeName (undefined :: M1 D f x a)
