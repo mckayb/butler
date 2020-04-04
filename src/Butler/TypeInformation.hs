@@ -11,12 +11,29 @@
 
 module Butler.TypeInformation where
 
+import Data.Text (Text)
+import Data.Proxy (Proxy)
 import GHC.Generics (U1, M1, D, C, Selector(selName), Datatype(datatypeName), S, K1, R, (:*:))
-import Type.Reflection (SomeTypeRep(SomeTypeRep), Typeable)
-import qualified Type.Reflection as Reflection
+import qualified Data.Text as Text
+
+data FieldType = Number Int Int | Varchar Int deriving (Show)
+
+class HasFieldType a where
+    toFieldType :: FieldType
+
+instance HasFieldType Text where
+    toFieldType = Varchar 255
+
+instance HasFieldType Int where
+    toFieldType = Number 11 0
+
+instance HasFieldType a => HasFieldType (Proxy a) where
+    toFieldType = toFieldType @a
+
+type Field = (Text, FieldType)
 
 class Selectors rep where
-  selectors :: [(String, SomeTypeRep)]
+  selectors :: [Field]
 
 -- | Unit - Constructor without arguments
 instance Selectors U1 where
@@ -31,9 +48,9 @@ instance Selectors f => Selectors (M1 C x f) where
   selectors = selectors @f
 
 -- | Meta-information (record field names, etc.)
-instance (Selector s, Typeable t) => Selectors (M1 S s (K1 R t)) where
+instance (Selector s, HasFieldType t) => Selectors (M1 S s (K1 R t)) where
   selectors =
-    [(selName (undefined :: M1 S s (K1 R t) ()) , SomeTypeRep (Reflection.typeRep @t))]
+    [(Text.pack $ selName (undefined :: M1 S s (K1 R t) ()), toFieldType @t)]
 
 instance (Selectors a, Selectors b) => Selectors (a :*: b) where
   selectors = selectors @a ++ selectors @b
