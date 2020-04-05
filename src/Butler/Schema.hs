@@ -21,21 +21,7 @@ import GHC.Generics (Generic, Rep)
 import Butler.TypeInformation
 import qualified Data.Text as Text
 
--- data Relationship where
---     HasOne :: (b :: *) -> Relationship
---     HasMany :: (b :: *) -> Relationship
---     BelongsTo :: (b :: *) -> Relationship
---     BelongsToMany :: (b :: *) -> Relationship
-
-data Relationship = HasMany * | BelongsToMany *
---type HasMany (a :: k) = a
-
--- data Relationship = HasOne (Entity)
-
--- data Relationship r where
-    -- HasOne :: (b :: *) -> Relationship r
-
-data Schema a = Schema { schemaName :: Text, schemaFields :: [Field], schemaRelationships :: [Int] } deriving (Show)
+data Schema a = Schema { schemaName :: Text, schemaFields :: [Field], schemaRelationships :: [Relationship] }
 
 -- class Entity a where
 --     schema :: Schema rs a
@@ -56,6 +42,9 @@ class Entity (rs :: [Relationship]) a where
             constr = Text.toLower $ typename @(Rep a)
 
 
--- data User = User { userId :: Int, userName :: Text } deriving (Eq, Show, Generic, Entity)
-data Foo = Foo { fooId :: Int } deriving (Eq, Show, Generic, Entity '[BelongsToMany User])
-data User = User { userId :: Int, userName :: Text } deriving (Eq, Show, Generic, Entity '[HasMany Foo])
+data Comment = Comment { commentContent :: Text }
+    deriving (Eq, Show, Generic, Entity '[BelongsTo Post])
+data Post = Post { postTitle :: Text }
+    deriving (Eq, Show, Generic, Entity '[BelongsTo User, HasMany Comment])
+data User = User { userName :: Text }
+    deriving (Eq, Show, Generic, Entity '[HasMany Post])

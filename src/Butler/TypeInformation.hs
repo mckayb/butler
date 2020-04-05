@@ -16,12 +16,16 @@ import Data.Proxy (Proxy)
 import GHC.Generics (U1, M1, D, C, Selector(selName), Datatype(datatypeName), S, K1, R, (:*:))
 import qualified Data.Text as Text
 
+
 data FieldType = Number Int Int | Varchar Int deriving (Show)
 
 class HasFieldType a where
     toFieldType :: FieldType
 
 instance HasFieldType Text where
+    toFieldType = Varchar 255
+
+instance HasFieldType String where
     toFieldType = Varchar 255
 
 instance HasFieldType Int where
@@ -31,6 +35,7 @@ instance HasFieldType a => HasFieldType (Proxy a) where
     toFieldType = toFieldType @a
 
 type Field = (Text, FieldType)
+
 
 class Selectors rep where
   selectors :: [Field]
@@ -60,3 +65,13 @@ class TypeName rep where
 
 instance (Datatype f) => TypeName (M1 D f x) where
   typename = Text.pack $ datatypeName (undefined :: M1 D f x a)
+
+
+data Relationship = HasOne *
+    | BelongsTo *
+    | HasMany *
+    | BelongsToMany *
+
+class RelationshipSelectors rep where
+  relationshipSelectors :: [Relationship]
+
