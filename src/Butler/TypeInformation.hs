@@ -14,6 +14,8 @@ module Butler.TypeInformation where
 import Data.Text (Text)
 import Data.Proxy (Proxy)
 import GHC.Generics (U1, M1, D, C, Selector(selName), Datatype(datatypeName), S, K1, R, (:*:))
+import Type.Reflection (Typeable)
+import Data.Kind (Type)
 import qualified Data.Text as Text
 
 
@@ -67,11 +69,17 @@ instance (Datatype f) => TypeName (M1 D f x) where
   typename = Text.pack $ datatypeName (undefined :: M1 D f x a)
 
 
-data Relationship = HasOne *
-    | BelongsTo *
-    | HasMany *
-    | BelongsToMany *
+-- data Relationship = HasOne Type
+--     | BelongsTo Type
+--     | HasMany Type
+--     | BelongsToMany Type
+--     deriving (Show)
 
-class RelationshipSelectors rep where
-  relationshipSelectors :: [Relationship]
+-- class RelationshipSelectors rep where
+--   relationshipSelectors :: [Relationship]
+
+-- instance RelationshipSelectors U1 where
+  -- relationshipSelectors = []
+
+-- instance RelationshipSelectors
 
