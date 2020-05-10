@@ -123,7 +123,7 @@ model = Model
 test :: Model 'Resolved
 test = case knit model of
     Right resolved -> resolved
-    Left _ -> error "Nope, Bitch"
+    Left _ -> error "Nope"
 
 showUser :: IO ()
 showUser = print $ show test
