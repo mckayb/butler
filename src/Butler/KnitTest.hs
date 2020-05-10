@@ -42,10 +42,30 @@ data Comment model m = Comment
 deriving instance Show (Comment Model 'Unresolved)
 deriving instance Show (Comment Model 'Resolved)
 
+data A model m = A
+    { aId :: Id model m Int
+    , aName :: Text
+    , aBs :: [ForeignId model m "bs" "bId"]
+    } deriving (Generic, KnitRecord Model)
+
+deriving instance Show (A Model 'Unresolved)
+deriving instance Show (A Model 'Resolved)
+
+data B model m = B
+    { bId :: Id model m Int 
+    , bName :: Text
+    , bAs :: [ForeignId model m "as" "aId"]
+    } deriving (Generic, KnitRecord Model)
+
+deriving instance Show (B Model 'Unresolved)
+deriving instance Show (B Model 'Resolved)
+
 data Model m = Model
     { posts :: Table Model m Post
     , users :: Table Model m User
     , comments :: Table Model m Comment
+    , as :: Table Model m A
+    , bs :: Table Model m B
     } deriving (Generic, KnitTables)
 
 deriving instance Show (Model 'Resolved)
@@ -82,11 +102,27 @@ comment2 = Comment
     , commentPost = ForeignId 1
     }
 
+a :: A Model 'Unresolved
+a = A
+    { aId = Id 1
+    , aName = "Foo"
+    , aBs = [ForeignId 1]
+    }
+
+b :: B Model 'Unresolved
+b = B
+    { bId = Id 1
+    , bName = "Bar"
+    , bAs = [ForeignId 1]
+    }
+
 model :: Model 'Unresolved
 model = Model
     { posts = [post]
     , users = [user]
     , comments = [comment, comment2]
+    , as = [a]
+    , bs = [b]
     }
 
 test :: Model 'Resolved
@@ -94,5 +130,5 @@ test = case knit model of
     Right resolved -> resolved
     Left _ -> error "Nope"
 
-showUser :: IO ()
-showUser = print $ show test
+showModel :: IO ()
+showModel = print $ show test

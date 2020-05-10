@@ -1,15 +1,10 @@
-{-# LANGUAGE
-  AllowAmbiguousTypes,
-  DeriveGeneric,
-  FlexibleContexts,
-  FlexibleInstances,
-  RankNTypes,
-  TypeApplications,
-  TypeInType,
-  TypeOperators,
-  ScopedTypeVariables,
-  OverloadedStrings
-  #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE RankNTypes          #-}
+{-# LANGUAGE TypeInType          #-}
+{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Butler.Repo where
 

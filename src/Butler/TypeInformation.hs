@@ -1,5 +1,4 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes #-}
@@ -7,7 +6,6 @@
 {-# LANGUAGE TypeInType #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE DefaultSignatures #-}
 
 module Butler.TypeInformation where
 
@@ -65,19 +63,3 @@ class TypeName rep where
 
 instance (Datatype f) => TypeName (M1 D f x) where
   typename = Text.pack $ datatypeName (undefined :: M1 D f x a)
-
-
--- data Relationship = HasOne Type
---     | BelongsTo Type
---     | HasMany Type
---     | BelongsToMany Type
---     deriving (Show)
-
--- class RelationshipSelectors rep where
---   relationshipSelectors :: [Relationship]
-
--- instance RelationshipSelectors U1 where
-  -- relationshipSelectors = []
-
--- instance RelationshipSelectors
-
