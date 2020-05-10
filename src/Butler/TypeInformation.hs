@@ -14,8 +14,6 @@ module Butler.TypeInformation where
 import Data.Text (Text)
 import Data.Proxy (Proxy)
 import GHC.Generics (U1, M1, D, C, Selector(selName), Datatype(datatypeName), S, K1, R, (:*:))
-import Type.Reflection (Typeable)
-import Data.Kind (Type)
 import qualified Data.Text as Text
 
 

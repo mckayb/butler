@@ -28,6 +28,7 @@ dependencies:
 - servant-server
 - text
 - generic-deriving
+- knit
 
 library:
   source-dirs: src

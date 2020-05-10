@@ -18,7 +18,7 @@
 
 module Butler.Schema where
 
-import Data.Proxy (Proxy(..))
+-- import Data.Proxy (Proxy(..))
 import Data.Text (Text)
 import GHC.Generics (Generic, Rep)
 import Butler.TypeInformation
