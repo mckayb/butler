@@ -15,8 +15,8 @@ import Knit
 data User model m = User
     { userId :: Id model m Int
     , userName :: Text
-    , userPosts :: [ForeignId model m "postsTable" "postId"]
-    , userComments :: [ForeignId model m "commentsTable" "commentId"]
+    , userPosts :: [ForeignId model m "posts" "postId"]
+    , userComments :: [ForeignId model m "comments" "commentId"]
     } deriving (Generic, KnitRecord Model)
 
 deriving instance Show (User Model 'Unresolved)
@@ -25,8 +25,8 @@ deriving instance Show (User Model 'Resolved)
 data Post model m = Post
     { postId :: Id model m Int
     , postTitle :: Text
-    , postUser :: ForeignId model m "usersTable" "userId"
-    , postComments :: [ForeignId model m "commentsTable" "commentId"]
+    , postUser :: ForeignId model m "users" "userId"
+    , postComments :: [ForeignId model m "comments" "commentId"]
     } deriving (Generic, KnitRecord Model)
 
 deriving instance Show (Post Model 'Unresolved)
@@ -35,17 +35,17 @@ deriving instance Show (Post Model 'Resolved)
 data Comment model m = Comment
     { commentId :: Id model m Int
     , commentText :: Text
-    , commentUser :: ForeignId model m "usersTable" "userId"
-    , commentPost :: ForeignId model m "postsTable" "postId"
+    , commentUser :: ForeignId model m "users" "userId"
+    , commentPost :: ForeignId model m "posts" "postId"
     } deriving (Generic, KnitRecord Model)
 
 deriving instance Show (Comment Model 'Unresolved)
 deriving instance Show (Comment Model 'Resolved)
 
 data Model m = Model
-    { postsTable :: Table Model m Post
-    , usersTable :: Table Model m User
-    , commentsTable :: Table Model m Comment
+    { posts :: Table Model m Post
+    , users :: Table Model m User
+    , comments :: Table Model m Comment
     } deriving (Generic, KnitTables)
 
 deriving instance Show (Model 'Resolved)
@@ -84,9 +84,9 @@ comment2 = Comment
 
 model :: Model 'Unresolved
 model = Model
-    { postsTable = [post]
-    , usersTable = [user]
-    , commentsTable = [comment, comment2]
+    { posts = [post]
+    , users = [user]
+    , comments = [comment, comment2]
     }
 
 test :: Model 'Resolved
