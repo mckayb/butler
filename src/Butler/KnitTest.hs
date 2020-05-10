@@ -70,6 +70,8 @@ data Model m = Model
 
 deriving instance Show (Model 'Resolved)
 
+-- One to Many User to Post
+-- One to Many User to Post
 user :: User Model 'Unresolved
 user = User
     { userId = Id 1
@@ -78,6 +80,8 @@ user = User
     , userComments = []
     }
 
+-- One to Many Post to Comment
+-- Many to One Post to User
 post :: Post Model 'Unresolved
 post = Post
     { postId = Id 1
@@ -86,6 +90,8 @@ post = Post
     , postUser = ForeignId 1
     }
 
+-- Many to One Comment to Post
+-- Many to One Comment to User
 comment :: Comment Model 'Unresolved
 comment = Comment
     { commentId = Id 1
@@ -102,6 +108,7 @@ comment2 = Comment
     , commentPost = ForeignId 1
     }
 
+-- Many to Many A to B
 a :: A Model 'Unresolved
 a = A
     { aId = Id 1
