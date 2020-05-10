@@ -11,37 +11,6 @@ import GHC.Generics (Generic)
 import Data.Text (Text)
 import Knit
 
-{-
-data Person model m = Person
-  { name        :: Id model m String
-  , loves       :: ForeignId model m "persons" "name" --
-  , isPresident :: Bool                               --
-  } deriving (Generic, KnitRecord Model)              --
-                                                      -- 
-data Model m = Model                                  --
-  { persons :: Table Model m Person -- <----------------
-  } deriving (Generic, KnitTables)
-
-alice :: Person Model 'Unresolved
-alice = Person
-  { name        = Id "Alice"
-  , loves       = ForeignId "Bob"  -- this must be a String, since Model.persons.name is a String!
-  , isPresident = False
-  }
-
-bob :: Person Model 'Unresolved
-bob = Person
-  { name        = Id "Bob"
-  , loves       = ForeignId "Alice"
-  , isPresident = False
-  }
-
-model :: Model 'Unresolved
-model = Model
-  { persons = [alice, bob]  -- `Table` is just a regular list
-  }
--}
-
 
 data User model m = User
     { userId :: Id model m Int
@@ -127,11 +96,3 @@ test = case knit model of
 
 showUser :: IO ()
 showUser = print $ show test
-
-{- model :: Model Unresolved
-model = _
-
-test :: Int -> Model Resolved
-test = case knit model of
-    Right resolved -> resolved
-    Left e -> error "Nope, Bitch" -}
