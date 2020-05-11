@@ -80,6 +80,8 @@ instance Selectors (Rep a) => Selectors [a] where
 
 type TableSchema = [(Text, [Field])]
 
+-- TODO: How can modelSelectors be smart enough to detect if a relationship is many to many
+-- and therefore needs a bridge table?
 class ModelSelectors rep where
   modelSelectors :: TableSchema
 
