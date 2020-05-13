@@ -29,6 +29,7 @@ dependencies:
 - text
 - generic-deriving
 - knit
+- unordered-containers
 
 library:
   source-dirs: src

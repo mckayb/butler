@@ -11,16 +11,22 @@
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Butler.TypeInformation (ModelSelectors(schema), TableSchema) where
+module Butler.TypeInformation (ModelSelectors(modelSelectors, schema), TableSchema) where
 
 import Knit
 import Data.Text (Text)
 import Data.Proxy (Proxy(Proxy))
 import GHC.Generics (Rep, U1, M1, D, C, Selector(selName), S, K1, R, (:*:), (:+:))
 import GHC.TypeLits (KnownSymbol, symbolVal)
+import Data.HashMap.Strict (HashMap, (!))
+import qualified Data.Maybe as Maybe
+import qualified Data.List as List
 import qualified Data.Text as Text
+import qualified Data.HashMap.Strict as HashMap
 
-data FieldType = Number Int Int | Varchar Int | Foreign String String FieldType deriving (Show)
+import Debug.Trace
+
+data FieldType = Number Int Int | Varchar Int | Foreign Text Text FieldType deriving (Eq, Show)
 
 class HasFieldType a where
   toFieldType :: FieldType
@@ -44,10 +50,10 @@ instance HasFieldType a => HasFieldType (RecordId a) where
   toFieldType = toFieldType @a
 
 instance (KnownSymbol table, KnownSymbol field, HasFieldType a) => HasFieldType (ForeignRecordId table field a) where
-  toFieldType = Foreign (symbolVal (Proxy @table)) (symbolVal (Proxy @field)) (toFieldType @a)
+  toFieldType = Foreign (Text.pack . symbolVal $ Proxy @table) (Text.pack . symbolVal $ Proxy @field) (toFieldType @a)
 
 instance (KnownSymbol table, KnownSymbol field, HasFieldType a) => HasFieldType [ForeignRecordId table field a] where
-  toFieldType = Foreign (symbolVal (Proxy @table)) (symbolVal (Proxy @field)) (toFieldType @a)
+  toFieldType = Foreign (Text.pack . symbolVal $ Proxy @table) (Text.pack . symbolVal $ Proxy @field) (toFieldType @a)
 
 
 type Field = (Text, FieldType)
@@ -93,12 +99,45 @@ type TableSchema = [(Text, [Field])]
 class ModelSelectors rep where
   modelSelectors :: TableSchema
 
-  -- Generic bridge tables here
   schema :: TableSchema
   default schema :: TableSchema
   -- TODO: We need to comb through this list, and if we find a two-way relationship, then we found a many to many
   -- If we find the many to many, we need to remove the field from each of the tables, and then add a new table with those values.
-  schema = filter (const True) $ modelSelectors @rep
+  schema = foldr f [] initialSchema
+    where
+      kv :: HashMap Text [Field]
+      kv = HashMap.fromList initialSchema
+
+      f :: (Text, [Field]) -> TableSchema -> TableSchema
+      f (table1, fields1) acc =
+        let
+          containsMatchingForeignField :: [Field] -> Bool
+          containsMatchingForeignField =
+            Maybe.isJust
+            . List.find (\(_, fieldType) -> case fieldType of
+                Foreign table2 _ _ -> table1 == table2
+                _ -> False)
+
+          removeIfForeignManyToMany :: Field -> ([Field], TableSchema) -> ([Field], TableSchema)
+          removeIfForeignManyToMany field@(_, fieldType) (fields, schemas) =
+            case fieldType of
+              Foreign table2 _ _ ->
+                if containsMatchingForeignField (kv ! table2)
+                  -- TODO: Add a new schema here
+                  then (fields, schemas)
+                  else (fields <> [field], schemas)
+
+              _ -> (fields <> [field], schemas)
+
+          additionalInfo :: ([Field], TableSchema)
+          additionalInfo = foldr removeIfForeignManyToMany ([], []) fields1
+
+        in acc <> [(table1, fst additionalInfo)] <> snd additionalInfo
+
+      initialSchema :: TableSchema
+      initialSchema = modelSelectors @rep
+
+
 
 instance ModelSelectors U1 where
   modelSelectors = []
