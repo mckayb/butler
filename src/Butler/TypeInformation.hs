@@ -92,19 +92,20 @@ instance (KnitRecord (tables :: Mode -> *) t, Selectors (Rep (t tables 'Unresolv
   selectors = selectors @(Rep (t tables 'Unresolved))
 
 
-type TableSchema = [(Text, [Field])]
+type TableSchema = (Text, [Field])
+type DatabaseSchema = [TableSchema]
 
 class ModelSelectors rep where
-  modelSelectors :: TableSchema
+  modelSelectors :: DatabaseSchema
 
-  schema :: TableSchema
-  default schema :: TableSchema
+  schema :: DatabaseSchema
+  default schema :: DatabaseSchema
   schema = foldr f [] initialSchema
     where
       kv :: HashMap Text [Field]
       kv = HashMap.fromList initialSchema
 
-      f :: (Text, [Field]) -> TableSchema -> TableSchema
+      f :: (Text, [Field]) -> DatabaseSchema -> DatabaseSchema
       f (table1, fields1) acc =
         let
           containsMatchingForeignField :: [Field] -> Maybe Field
@@ -113,7 +114,7 @@ class ModelSelectors rep where
               Foreign table2 _ _ -> table1 == table2
               _ -> False)
 
-          attachManyToMany :: Field -> ([Field], TableSchema) -> ([Field], TableSchema)
+          attachManyToMany :: Field -> ([Field], DatabaseSchema) -> ([Field], DatabaseSchema)
           attachManyToMany field@(_, fieldType) (fields, schemas) =
             case fieldType of
               Foreign table2 _ _ ->
@@ -122,12 +123,12 @@ class ModelSelectors rep where
                   Nothing -> (fields <> [field], schemas)
               _ -> (fields <> [field], schemas)
 
-          additionalInfo :: ([Field], TableSchema)
+          additionalInfo :: ([Field], DatabaseSchema)
           additionalInfo = foldr attachManyToMany ([], []) fields1
 
         in acc <> [(table1, fst additionalInfo)] <> snd additionalInfo
 
-      initialSchema :: TableSchema
+      initialSchema :: DatabaseSchema
       initialSchema = modelSelectors @rep
 
 
