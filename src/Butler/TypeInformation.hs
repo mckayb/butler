@@ -131,8 +131,6 @@ class ModelSelectors rep where
       initialSchema :: DatabaseSchema
       initialSchema = modelSelectors @rep
 
-
-
 instance ModelSelectors U1 where
   modelSelectors = []
 
@@ -143,10 +141,6 @@ instance ModelSelectors f => ModelSelectors (M1 D x f) where
 -- | Meta-information (constructor names, etc.)
 instance ModelSelectors f => ModelSelectors (M1 C x f) where
   modelSelectors = modelSelectors @f
-
--- instance (Selector s, Selectors (Rep t)) => ModelSelectors (M1 S s (K1 R t)) where
-  -- modelSelectors =
-    -- [(Text.pack $ selName (undefined :: M1 S s (K1 R t) ()), selectors @(Rep t))]
 
 instance (Selector s, KnitRecord (tables :: Mode -> *) t, Selectors (Rep (t tables mode))) => ModelSelectors (M1 S s (K1 R [t tables mode])) where
   modelSelectors =
