@@ -27,7 +27,6 @@ dependencies:
 - servant
 - servant-server
 - text
-- generic-deriving
 - knit
 - unordered-containers
 
