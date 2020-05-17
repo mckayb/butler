@@ -99,8 +99,6 @@ class ModelSelectors rep where
 
   schema :: TableSchema
   default schema :: TableSchema
-  -- TODO: We need to comb through this list, and if we find a two-way relationship, then we found a many to many
-  -- If we find the many to many, we need to remove the field from each of the tables, and then add a new table with those values.
   schema = foldr f [] initialSchema
     where
       kv :: HashMap Text [Field]
