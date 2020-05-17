@@ -1,6 +1,4 @@
-module Butler
-    ( someFunc
-    ) where
+module Butler (someFunc) where
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
