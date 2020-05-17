@@ -1,0 +1,3 @@
+- Template haskell for all of the derivations for the models/tables maybe?
+- How do we perform queries/hook up to a database?
+- Can we provide some options for generic schema validation, kinda like Aeson does with json generation?
