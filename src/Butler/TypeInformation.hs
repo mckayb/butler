@@ -19,12 +19,10 @@ import Data.Proxy (Proxy(Proxy))
 import GHC.Generics (Rep, U1, M1, D, C, Selector(selName), S, K1, R, (:*:), (:+:))
 import GHC.TypeLits (KnownSymbol, symbolVal)
 import Data.HashMap.Strict (HashMap, (!))
-import qualified Data.Maybe as Maybe
 import qualified Data.List as List
 import qualified Data.Text as Text
 import qualified Data.HashMap.Strict as HashMap
 
-import Debug.Trace
 
 data FieldType = Number Int Int | Varchar Int | Foreign Text Text FieldType deriving (Eq, Show)
 
@@ -111,22 +109,19 @@ class ModelSelectors rep where
       f :: (Text, [Field]) -> TableSchema -> TableSchema
       f (table1, fields1) acc =
         let
-          containsMatchingForeignField :: [Field] -> Bool
+          containsMatchingForeignField :: [Field] -> Maybe Field
           containsMatchingForeignField =
-            Maybe.isJust
-            . List.find (\(_, fieldType) -> case fieldType of
-                Foreign table2 _ _ -> table1 == table2
-                _ -> False)
+            List.find (\(_, fieldType) -> case fieldType of
+              Foreign table2 _ _ -> table1 == table2
+              _ -> False)
 
           removeIfForeignManyToMany :: Field -> ([Field], TableSchema) -> ([Field], TableSchema)
           removeIfForeignManyToMany field@(_, fieldType) (fields, schemas) =
             case fieldType of
               Foreign table2 _ _ ->
-                if containsMatchingForeignField (kv ! table2)
-                  -- TODO: Add a new schema here
-                  then (fields, schemas)
-                  else (fields <> [field], schemas)
-
+                case containsMatchingForeignField (kv ! table2) of
+                  Just (_, fieldType2) -> (fields, schemas <> [(table1 <> "_" <> table2, [("id", Number 11 0), (table1 <> "_id", fieldType), (table2 <> "_id", fieldType2)])])
+                  Nothing -> (fields <> [field], schemas)
               _ -> (fields <> [field], schemas)
 
           additionalInfo :: ([Field], TableSchema)
