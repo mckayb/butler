@@ -115,17 +115,17 @@ class ModelSelectors rep where
               Foreign table2 _ _ -> table1 == table2
               _ -> False)
 
-          removeIfForeignManyToMany :: Field -> ([Field], TableSchema) -> ([Field], TableSchema)
-          removeIfForeignManyToMany field@(_, fieldType) (fields, schemas) =
+          attachManyToMany :: Field -> ([Field], TableSchema) -> ([Field], TableSchema)
+          attachManyToMany field@(_, fieldType) (fields, schemas) =
             case fieldType of
               Foreign table2 _ _ ->
                 case containsMatchingForeignField (kv ! table2) of
-                  Just (_, fieldType2) -> (fields, schemas <> [(table1 <> "_" <> table2, [("id", Number 11 0), (table1 <> "_id", fieldType), (table2 <> "_id", fieldType2)])])
+                  Just (_, fieldType2) -> (fields, schemas <> [(table1 <> "_" <> table2, [("id", Number 11 0), (table1 <> "_id", fieldType2), (table2 <> "_id", fieldType)])])
                   Nothing -> (fields <> [field], schemas)
               _ -> (fields <> [field], schemas)
 
           additionalInfo :: ([Field], TableSchema)
-          additionalInfo = foldr removeIfForeignManyToMany ([], []) fields1
+          additionalInfo = foldr attachManyToMany ([], []) fields1
 
         in acc <> [(table1, fst additionalInfo)] <> snd additionalInfo
 
